@@ -18,6 +18,23 @@ app.use('/api', publicRoutes)
 app.use('/api/user', userRoutes)
 app.use('/api/admin', adminRoutes)
 
+const allowedOrigins = [
+  'http://localhost:5173',
+  process.env.FRONTEND_URL, // your Vercel URL, set in Render env vars
+]
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // allow requests with no origin (Postman, curl) and allowed origins
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true)
+    } else {
+      callback(new Error(`CORS blocked: ${origin}`))
+    }
+  },
+  credentials: true,
+}))
+
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
